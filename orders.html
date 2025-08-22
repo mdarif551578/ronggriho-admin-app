@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Orders</title>
+    <link href="./static/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./static/style.css">
+    <!-- Small, non-intrusive CSS override to ensure full order text is visible and wraps properly -->
+    <style>
+        /* Make table use automatic layout so columns size to content where helpful */
+        .orders-table {
+            table-layout: auto;
+        }
+
+        /* Ensure cells wrap and don't get truncated by any external .truncate or overflow rules */
+        .orders-table th,
+        .orders-table td {
+            white-space: normal !important;      /* allow wrapping */
+            /* word-break: break-word !important;  break long words (IDs / long addresses) */
+            overflow: visible !important;       /* ensure nothing gets clipped */
+            vertical-align: top;
+            padding-top: 0.75rem;               /* match existing padding rhythm */
+            padding-bottom: 0.75rem;
+        }
+
+        /* Optionally limit extremely long single cells so wrapping looks sane on wide screens */
+        .orders-table td {
+            max-width: 28rem; /* adjust this value if you want wider or narrower wrapped columns */
+        }
+
+        /* Keep the responsive wrapper working as before */
+        .orders-wrapper {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- Card wrapper to match requested UI: rounded-2xl, shadow-sm, border -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-semibold mb-0 text-slate-900 dark:text-white">Manage Orders</h1>
+                <a href="/"
+                    class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Home
+                </a>
+            </div>
+
+            <!-- Edit form card (kept same IDs & structure) -->
+            <div id="updateFormContainer" style="display:none;"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-50 dark:border-gray-700">
+                <h2 id="formTitle" class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Edit Order</h2>
+                <form id="orderForm" class="space-y-4">
+                    <input type="hidden" id="orderId">
+
+                    <div>
+                        <label for="uid" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">User
+                            ID</label>
+                        <input type="text" id="uid"
+                            class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed"
+                            placeholder="User ID" readonly>
+                    </div>
+
+                    <div>
+                        <label for="items"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Items</label>
+                        <input type="text" id="items"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Items (e.g., prod_id1:2:19.99,prod_id2:1:24.99)">
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="total"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Total</label>
+                            <input type="number" step="0.01" id="total"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Total">
+                        </div>
+                        <div>
+                            <label for="status"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                            <select id="status"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               >
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="shippingFullName"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Full Name</label>
+                            <input type="text" id="shippingFullName"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Shipping Full Name">
+                        </div>
+                        <div>
+                            <label for="shippingPhone"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                            <input type="text" id="shippingPhone"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Shipping Phone">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="shippingAddress"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                        <input type="text" id="shippingAddress"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Shipping Address">
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="shippingCity"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
+                            <input type="text" id="shippingCity"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Shipping City">
+                        </div>
+                        <div>
+                            <label for="shippingDistrict"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">District</label>
+                            <input type="text" id="shippingDistrict"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                placeholder="Shipping District">
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="paymentMethod"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Payment Method</label>
+                            <select id="paymentMethod"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               >
+                                <option value="cash">Cash on Delivery</option>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="bank">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="paymentStatus"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Payment Status</label>
+                            <select id="paymentStatus"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               >
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3">
+                        <button type="submit" id="submitButton"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Update
+                            Order</button>
+                        <button type="button" id="cancelButton"
+                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Existing Orders section styled like an accordion-card header but retaining the table for JS -->
+            <div class="bg-white rounded-xl p-6 border border-gray-50 dark:bg-gray-800 dark:border-gray-700">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900 dark:text-white">Existing Orders</h2>
+
+                <!-- Optionally: short description / controls could go here -->
+                <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">Browse and manage customer orders. Use the action buttons in each row to edit or delete an order.</div>
+
+                <!-- Keep the table and tbody id the same so your JS remains functional -->
+                <div class="relative orders-wrapper sm:rounded-lg">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 orders-table">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Order ID</th>
+                                <th scope="col" class="px-6 py-3">User ID</th>
+                                <th scope="col" class="px-6 py-3">Items</th>
+                                <th scope="col" class="px-6 py-3">Total</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3">Shipping Name</th>
+                                <th scope="col" class="px-6 py-3">Shipping Address</th>
+                                <th scope="col" class="px-6 py-3">Shipping City</th>
+                                <th scope="col" class="px-6 py-3">Shipping District</th>
+                                <th scope="col" class="px-6 py-3">Shipping Phone</th>
+                                <th scope="col" class="px-6 py-3">Payment Method</th>
+                                <th scope="col" class="px-6 py-3">Payment Status</th>
+                                <th scope="col" class="px-6 py-3">Created At</th>
+                                <th scope="col" class="px-6 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Your JS should populate rows here as before. -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="./static/firebase-app-compat.js"></script>
+    <script src="./static/firebase-firestore-compat.js"></script>
+
+    <script src="./static/flowbite.min.js"></script>
+
+    <script src="./app.js"></script>
+</body>
+
+</html>

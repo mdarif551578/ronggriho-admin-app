@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Products</title>
+    <link href="./static/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./static/style.css">
+    <style>
+        .accordion-item { border: 1px solid #e6e9ee; background: #ffffff; }
+        .accordion-header { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 1rem 1.5rem; cursor: pointer; background-color: #ffffff; transition: background-color 0.2s ease-in-out; }
+        .accordion-header:hover { background-color: #f6f8fb; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #fafbfc; }
+        .accordion-content.open { max-height: 1500px; transition: max-height 0.5s ease-in; }
+        .stock-indicator { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .stock-in { background-color: #16a34a; }
+        .stock-low { background-color: #d97706; }
+        .stock-out { background-color: #dc2626; }
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+        .control-bg { background-color: #ffffff; color: #0f172a; }
+        .control-border { border-color: #e6e9ee; }
+        .checkbox-group-container { padding: 0.75rem; border: 1px solid #e6e9ee; border-radius: 0.5rem; background-color: #ffffff; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 1rem; }
+    </style>
+</head>
+
+<body class="antialiased bg-gray-50 text-slate-900">
+    <div class="max-w-6xl mx-auto p-6">
+        <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-slate-900">Manage Products</h1>
+
+        <!-- Add/Edit Product Form -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <h2 id="formTitle" class="text-2xl font-semibold mb-4 text-slate-900">Add Product</h2>
+            <form id="productForm" class="space-y-4">
+                <input type="hidden" id="productId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label for="name" class="block mb-2 text-sm font-medium text-slate-800">Product Name</label><input type="text" id="name" required class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                    <div><label for="slug" class="block mb-2 text-sm font-medium text-slate-800">Slug</label><input type="text" id="slug" required class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                </div>
+                <div><label for="description" class="block mb-2 text-sm font-medium text-slate-800">Description</label><textarea id="description" required class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"></textarea></div>
+                <div><label for="longDescription" class="block mb-2 text-sm font-medium text-slate-800">Long Description</label><textarea id="longDescription" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"></textarea></div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-slate-800">Product Reviews</label>
+                    <div id="reviewsContainer" class="space-y-2"><button type="button" id="addReviewButton" class="inline-flex items-center gap-2 text-slate-700 bg-emerald-600 hover:bg-emerald-700 font-medium rounded-lg text-sm px-3 py-1.5 transition shadow-sm">+ Add Review</button></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div><label for="price" class="block mb-2 text-sm font-medium text-slate-800">Price</label><input type="number" id="price" step="0.01" required class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                    <div><label for="discountPrice" class="block mb-2 text-sm font-medium text-slate-800">Discount Price</label><input type="number" id="discountPrice" step="0.01" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                    <div><label for="stock" class="block mb-2 text-sm font-medium text-slate-800">Stock</label><input type="number" id="stock" required class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                    <div><label for="shippingFee" class="block mb-2 text-sm font-medium text-slate-800">Shipping Fee</label><input type="number" id="shippingFee" step="0.01" min="0" value="0" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-slate-800">Category</label>
+                    <div id="category" class="checkbox-group-container"><div class="checkbox-group"><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="category" value="Urban Desi" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Urban Desi</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="category" value="Global Threads" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Global Threads</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="category" value="T-Shirts" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>T-Shirts</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="category" value="Accessories" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Accessories</span></label></div></div>
+                </div>
+                <div><label for="tags" class="block mb-2 text-sm font-medium text-slate-800">Tags (comma separated)</label><input type="text" id="tags" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                <div><label for="images" class="block mb-2 text-sm font-medium text-slate-800">Image URLs (comma separated)</label><textarea id="images" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"></textarea></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block mb-2 text-sm font-medium text-slate-800">Sizes</label><div id="sizes" class="checkbox-group-container"><div class="checkbox-group"><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="size" value="S" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>S</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="size" value="M" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>M</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="size" value="L" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>L</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="size" value="XL" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>XL</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="size" value="XXL" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>XXL</span></label></div></div></div>
+                    <div><label class="block mb-2 text-sm font-medium text-slate-800">Colors</label><div id="colors" class="checkbox-group-container"><div class="checkbox-group"><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="color" value="Red" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Red</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="color" value="Blue" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Blue</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="color" value="Green" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Green</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="color" value="Black" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>Black</span></label><label class="flex items-center space-x-2 text-slate-700"><input type="checkbox" name="color" value="White" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span>White</span></label></div></div></div>
+                </div>
+                <div><label for="relatedProductIds" class="block mb-2 text-sm font-medium text-slate-800">Related Product IDs (comma separated)</label><input type="text" id="relatedProductIds" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" /></div>
+                <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer text-slate-800"><input type="checkbox" id="isFeatured" class="mr-2 h-4 w-4 rounded border control-border">Featured Product</label><label class="flex items-center cursor-pointer text-slate-800"><input type="checkbox" id="isFlashSale" class="mr-2 h-4 w-4 rounded border control-border">Flash Sale Product</label></div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="submitButton" class="text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg text-sm px-5 py-2.5 transition shadow-sm">Add Product</button>
+                    <button type="button" id="cancelButton" style="display: none;" class="text-slate-700 bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 transition shadow-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Product Accordion List -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-2xl font-semibold mb-4 text-slate-900">Existing Products</h2>
+            <div id="productsAccordion" class="space-y-3">
+                <!-- Products will be injected here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="./static/firebase-app-compat.js"></script>
+    <script src="./static/firebase-firestore-compat.js"></script>
+    <!-- Flowbite for UI components if needed -->
+    <script src="./static/flowbite.min.js"></script>
+    
+    <!-- Your Consolidated Admin Script -->
+    <script src="./app.js"></script>
+</body>
+
+</html>

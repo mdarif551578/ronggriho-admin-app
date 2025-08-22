@@ -1,0 +1,104 @@
+body {
+    font-family: sans-serif;
+    margin: 2em;
+}
+
+.relative.overflow-x-auto {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+table img {
+    max-width: 50px;
+    max-height: 50px;
+    object-fit: cover;
+}
+
+td {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.accordion-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.accordion-header:hover {
+    background-color: #f6f8fb;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background-color: #fafbfc;
+}
+
+.accordion-content.open {
+    max-height: 1000px;
+    /* Adjust as needed for max content height */
+    transition: max-height 0.5s ease-in;
+}
+
+.stock-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.stock-in {
+    background-color: #16a34a;
+    /* green-600 */
+}
+
+.stock-low {
+    background-color: #d97706;
+    /* amber-600 */
+}
+
+.stock-out {
+    background-color: #dc2626;
+    /* red-600 */
+}
+
+.accordion-arrow {
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.open .accordion-arrow {
+    transform: rotate(180deg);
+}
+
+/* Ensure form controls have consistent light backgrounds */
+.control-bg {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+
+.control-border {
+    border-color: #e6e9ee;
+}
+
+/* Styling for checkbox groups */
+.checkbox-group-container {
+    padding: 0.75rem;
+    border: 1px solid #e6e9ee;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}

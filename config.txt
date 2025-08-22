@@ -1,0 +1,12 @@
+
+firebaseConfig = {
+  "apiKey": "AIzaSyAYxNV1soev0QJ5m8_gz_qykG5a4qBdrLo",
+  "authDomain": "dhakai-threads.firebaseapp.com",
+  "projectId": "dhakai-threads",
+  "databaseURL": "https://dhakai-threads-default-rtdb.firebaseio.com",
+  "storageBucket": "dhakai-threads.firebasestorage.app",
+  "messagingSenderId": "932531070870",
+  "appId": "1:932531070870:web:87bae6648e3b7bee909fb7",
+  "measurementId": "G-RLZGCTSV9H"
+}
+
