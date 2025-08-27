@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Product with JSON</title>
+    <link href="./static/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./static/style.css">
+</head>
+
+<body class="antialiased bg-gray-50 text-slate-900">
+    <div class="max-w-6xl mx-auto p-6">
+        <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-slate-900">Add Product with JSON</h1>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-slate-900">Paste Product JSON</h2>
+            <form id="jsonProductForm" class="space-y-4">
+                <div>
+                    <label for="productJson" class="block mb-2 text-sm font-medium text-slate-800">Product JSON</label>
+                    <textarea id="productJson" rows="20" class="w-full p-3 rounded-lg border control-border control-bg placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200" placeholder="Paste your product JSON here..."></textarea>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="submitJsonButton" class="text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg text-sm px-5 py-2.5 transition shadow-sm">Add Product</button>
+                </div>
+            </form>
+            <div id="statusMessage" class="mt-4 text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="./static/firebase-app-compat.js"></script>
+    <script src="./static/firebase-firestore-compat.js"></script>
+    <!-- Flowbite for UI components if needed -->
+    <script src="./static/flowbite.min.js"></script>
+    
+    <!-- Your Consolidated Admin Script -->
+    <script src="./app.js"></script>
+
+    <script>
+        if (document.getElementById('jsonProductForm')) {
+            const jsonProductForm = document.getElementById('jsonProductForm');
+            const statusMessage = document.getElementById('statusMessage');
+
+            jsonProductForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                statusMessage.textContent = 'Adding product...';
+                statusMessage.className = 'text-blue-600';
+
+                const jsonString = document.getElementById('productJson').value;
+                if (!jsonString) {
+                    statusMessage.textContent = 'Error: JSON input cannot be empty.';
+                    statusMessage.className = 'text-red-600';
+                    return;
+                }
+
+                try {
+                    const productData = JSON.parse(jsonString);
+
+                    // Convert createdAt to Firestore Timestamp
+                    if (productData.createdAt && typeof productData.createdAt === 'string') {
+                        productData.createdAt = firebase.firestore.Timestamp.fromDate(new Date(productData.createdAt));
+                    } else {
+                        productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+
+                    // Ensure numeric fields are numbers
+                    productData.price = Number(productData.price || 0);
+                    productData.discountPrice = Number(productData.discountPrice || 0);
+                    productData.stock = Number(productData.stock || 0);
+                    productData.shippingFee = Number(productData.shippingFee || 0);
+
+
+                    await db.collection('products').add(productData);
+
+                    statusMessage.textContent = 'Product added successfully!';
+                    statusMessage.className = 'text-green-600';
+                    jsonProductForm.reset();
+
+                } catch (error) {
+                    console.error('Error adding product:', error);
+                    statusMessage.textContent = `Error: ${error.message}`;
+                    statusMessage.className = 'text-red-600';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
